@@ -38,15 +38,6 @@ fn main() {
     let mut state = State::InText;
 
     for byte in std::io::stdin().bytes().map(|b| b.unwrap()) {
-        // println!(
-        //     "{:?} state {}",
-        //     byte as char,
-        //     match state {
-        //         State::InText => "InText".to_string(),
-        //         State::MaybeBase64Utf8(ref maybe) =>
-        //             format!("MaybeBase64Utf8({})", maybe.strikes).to_owned(),
-        //     }
-        // );
         match state {
             State::InText => {
                 if BASE64_CHARS.contains(byte as char) {
@@ -72,14 +63,18 @@ fn main() {
                     if maybe_base64.strikes > 0 {
                         print!("{}", maybe_base64.raw());
                     } else {
-                        let decoded = maybe_base64.decoded();
-                        if let Some(decoded) = decoded {
-                            println!("");
-                            println!("===== decoded =====");
-                            println!("{}", decoded);
-                            println!("===================");
-                        } else {
+                        if maybe_base64.raw().len() < 10 {
                             print!("{}", maybe_base64.raw());
+                        } else {
+                            let decoded = maybe_base64.decoded();
+                            if let Some(decoded) = decoded {
+                                println!("");
+                                println!("===== decoded =====");
+                                println!("{}", decoded);
+                                println!("===================");
+                            } else {
+                                print!("{}", maybe_base64.raw());
+                            }
                         }
                     }
                     print!("{}", byte as char);
